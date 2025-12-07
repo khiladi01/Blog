@@ -2,13 +2,13 @@ import Userdata from '../models/user.model.js';
 
 export async function createUser (req , res) {
        try {
-        const {username , email , phone , address} = req.body
+        const {name , email , mobile , location} = req.body
 
-        if(!username || !email || !phone || !address){
+        if(!name || !email || !mobile || !location){
            return res.status(400).json({success: false , message: "All fields are mandatory"});
         }
 
-        const newUser = new Userdata({username , email , phone , address})
+        const newUser = new Userdata({name , email , mobile , location})
         await newUser.save();
 
         return res.status(201).json({success: true , message: "User created success" , newUser});

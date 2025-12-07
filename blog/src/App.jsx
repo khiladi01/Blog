@@ -1,14 +1,19 @@
 import { useState, useEffect } from "react";
 
 function App() {
-  const [usersdata, setUsersData] = useState([]);
+  const [user, setUser] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   async function fetchData() {
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:5000/api/user");
+      const res = await fetch("http://localhost:5000/api/user" , {
+        method: "GET",
+        headers: {
+          "content-type": "application/json"
+        }
+    });
 
       setLoading(false);
       if (!res.ok) throw new Error("Failed to fetch data");
@@ -16,13 +21,10 @@ function App() {
       const data = await res.json();
       console.log("Fetched Data", data);
 
-      const list =
-        data?.usersFind ??
-        data?.users ??
-        data?.user ??
-        (Array.isArray(data) ? data : []);
+      let list = [data.userData]
 
-      setUsersData(list);
+      console.log("Fetched List:", list)
+      setUser(list);
     } catch (error) {
       setLoading(false);
       setError(error.message);
@@ -36,7 +38,7 @@ function App() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  },[]);
 
   if (loading) return <p>Data Loading...</p>;
   if (error) return <p>{error}</p>;
@@ -45,20 +47,22 @@ function App() {
     <>
       <div className="h-screen bg-white flex justify-center items-center">
         {/* box */}
-        <div className="h-[400px] w-[500px] shadow-lg shadow-slate-300">
+        <div className="h-[400px] w-[500px] shadow-lg shadow-slate-300 rounded-lg">
           <section className="text-center text-2xl text-slate-900 font-bold uppercase">
             User Details
           </section>
-          {usersdata.length === 0 && <p>User Data No Found</p>}
+          <div className="h-[300px] w-[500px] flex justify-center items-center">
+            {user.length === 0 && <p>User Data No Found</p>}
 
-          {usersdata.map((item, index) => (
-            <div key={item._id ?? index}>
-              <p>{`Name: ${item.username}`}</p>
-              <p>{`Email: ${item.email}`}</p>
-              <p>{`Phone: ${item.phone}`}</p>
-              <p>{`Address: ${item.address}`}</p>
+          {user?.map((item, index) => (
+            <div key={item._id ?? index} className="w-[400px] grid place-content-center gap-2 bg-slate-50 rounded-2xl">
+              <p className="text-lg text-slate-700 font-semibold">Name: <span className="text-2xl text-red-400"> {item.name} </span> </p>
+              <p className="text-lg text-slate-700 font-semibold">Email: <span    className="text-lg text-slate-700"> {item.email} </span> </p>
+              <p className="text-lg text-slate-700 font-semibold">Mobile: <span   className="text-lg text-slate-700"> {item.mobile} </span> </p>
+              <p className="text-lg text-slate-700 font-semibold">Location: <span className="text-lg text-slate-700"> {item.location} </span> </p>
             </div>
           ))}
+          </div>
         </div>
       </div>
     </>
